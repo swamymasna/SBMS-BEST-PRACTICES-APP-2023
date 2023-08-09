@@ -1,0 +1,46 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver  
+    url: jdbc:mysql://localhost:3306/aop_db
+    username: root
+    password: root
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect  
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"        
+logging:
+  file:
+    name: F:/LogFiles/employee.log          
+    
+sbms-app:
+  messages:
+    
+    #employee-details
+    employee-not-found: "Employee Not Found With Id : "
+    employee-deletion-succeeded: "Employee Deleted Successfully With Id : "
+    
+    #user-details
+    user-exists-by-username: User Already Available with Username..!
+    user-exists-by-email: User Already Available with Email..!
+    role-not-found-by-name: Role Not Found With Role Name..!
+    user-registration-success: User has been Registered Successfully...!
+    user-loggedIn-success: User Logged-In Successfully..!
+    welcome-msg: Welcome to SBMS Best Practices Application..!!
+    
+jwt:
+  secret-key: 8F634BE2FC9D57575B578D852744BAF2D6DA759F52BADC6E25AE952113879CB4
+  expiration-date: 604800000    
+
+
+      
