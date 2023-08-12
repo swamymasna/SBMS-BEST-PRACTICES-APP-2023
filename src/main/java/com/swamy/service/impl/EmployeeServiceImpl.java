@@ -1,5 +1,16 @@
 package com.swamy.service.impl;
 
+import static com.swamy.utils.AppConstants.EMPLOYEE_DELETION_SUCCEEDED;
+import static com.swamy.utils.AppConstants.EMPLOYEE_NOT_FOUND;
+import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_DELETE_BUSINESS_EXCEPTION;
+import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_FETCHALL_BUSINESS_EXCEPTION;
+import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_FETCH_ALL_PAGINATION_BUSINESS_EXCEPTION;
+import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_SAVE_BUSINESS_EXCEPTION;
+import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_UPDATE_BUSINESS_EXCEPTION;
+import static com.swamy.utils.AppConstants.KEY;
+import static com.swamy.utils.AppConstants.VALUE;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,11 +27,11 @@ import org.springframework.stereotype.Service;
 import com.swamy.dto.EmployeeDto;
 import com.swamy.dto.EmployeeResponse;
 import com.swamy.entity.Employee;
+import com.swamy.exception.EmployeeServiceBusinessException;
 import com.swamy.exception.ResourceNotFoundException;
 import com.swamy.props.AppProperties;
 import com.swamy.repository.EmployeeRepository;
 import com.swamy.service.EmployeeService;
-import static com.swamy.utils.AppConstants.*;
 
 import lombok.AllArgsConstructor;
 
@@ -37,20 +48,45 @@ public class EmployeeServiceImpl implements EmployeeService {
 	@Override
 	public EmployeeDto saveEmployee(EmployeeDto employeeDto) {
 
-		Employee employee = modelMapper.map(employeeDto, Employee.class);
+		EmployeeDto employeeResponse = null;
 
-		Employee savedEmployee = employeeRepository.save(employee);
+		try {
+			Employee employee = modelMapper.map(employeeDto, Employee.class);
 
-		return modelMapper.map(savedEmployee, EmployeeDto.class);
+			Employee savedEmployee = employeeRepository.save(employee);
+
+			employeeResponse = modelMapper.map(savedEmployee, EmployeeDto.class);
+
+		} catch (Exception e) {
+			throw new EmployeeServiceBusinessException(
+					appProperties.getMessages().get(EMPLOYEE_SERVICE_SAVE_BUSINESS_EXCEPTION));
+		}
+
+		return employeeResponse;
 	}
 
 	@Override
 	public List<EmployeeDto> getAllEmployees() {
 
-		List<Employee> employees = employeeRepository.findAll();
+		List<EmployeeDto> employeesList = null;
+		try {
+			List<Employee> employees = employeeRepository.findAll();
 
-		return employees.stream().map(employee -> modelMapper.map(employee, EmployeeDto.class))
-				.collect(Collectors.toList());
+			if (!employees.isEmpty()) {
+				employeesList = employees.stream().map(employee -> modelMapper.map(employee, EmployeeDto.class))
+						.collect(Collectors.toList());
+			} else {
+				employeesList = Collections.emptyList();
+			}
+
+		} catch (Exception e) {
+			throw new EmployeeServiceBusinessException(
+					appProperties.getMessages().get(EMPLOYEE_SERVICE_FETCHALL_BUSINESS_EXCEPTION));
+
+		}
+
+		return employeesList;
+
 	}
 
 	@Cacheable(key = KEY, value = VALUE)
@@ -59,53 +95,84 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 		Employee employee = employeeRepository.findById(employeeId).orElseThrow(
 				() -> new ResourceNotFoundException(appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId));
-
 		return modelMapper.map(employee, EmployeeDto.class);
+
 	}
 
 	@CachePut(key = KEY, value = VALUE)
 	@Override
 	public EmployeeDto updateEmployee(Integer employeeId, EmployeeDto employeeDto) {
 
-		Employee employee = employeeRepository.findById(employeeId).orElseThrow(
-				() -> new ResourceNotFoundException(appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId));
+		EmployeeDto updateEmployeeResponse = null;
 
-		employee.setEmployeeName(employeeDto.getEmployeeName());
-		employee.setEmployeeSalary(employeeDto.getEmployeeSalary());
-		employee.setEmployeeAddress(employeeDto.getEmployeeAddress());
+		try {
+			Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new ResourceNotFoundException(
+					appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId));
 
-		Employee updatedEmployee = employeeRepository.save(employee);
+			employee.setEmployeeName(employeeDto.getEmployeeName());
+			employee.setEmployeeSalary(employeeDto.getEmployeeSalary());
+			employee.setEmployeeAddress(employeeDto.getEmployeeAddress());
 
-		return modelMapper.map(updatedEmployee, EmployeeDto.class);
+			Employee updatedEmployee = employeeRepository.save(employee);
+			updateEmployeeResponse = modelMapper.map(updatedEmployee, EmployeeDto.class);
+		} catch (Exception e) {
+			throw new EmployeeServiceBusinessException(
+					appProperties.getMessages().get(EMPLOYEE_SERVICE_UPDATE_BUSINESS_EXCEPTION));
+
+		}
+
+		return updateEmployeeResponse;
 	}
 
 	@CacheEvict(key = KEY, value = VALUE)
 	@Override
 	public String deleteEmployee(Integer employeeId) {
 
-		Employee employee = employeeRepository.findById(employeeId).orElseThrow(
-				() -> new ResourceNotFoundException(appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId));
+		String deletedEmployee = null;
 
-		employeeRepository.delete(employee);
+		try {
+			Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new ResourceNotFoundException(
+					appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId));
 
-		return appProperties.getMessages().get(EMPLOYEE_DELETION_SUCCEEDED) + employeeId;
+			employeeRepository.delete(employee);
+
+			deletedEmployee = appProperties.getMessages().get(EMPLOYEE_DELETION_SUCCEEDED) + employeeId;
+		} catch (Exception e) {
+			throw new EmployeeServiceBusinessException(
+					appProperties.getMessages().get(EMPLOYEE_SERVICE_DELETE_BUSINESS_EXCEPTION));
+
+		}
+
+		return deletedEmployee;
 	}
 
 	@Override
 	public EmployeeResponse getAllEmployees(Integer pageNo, Integer pageSize, String sortBy) {
 
-		Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+		EmployeeResponse employeeResponse = null;
 
-		Page<Employee> page = employeeRepository.findAll(pageable);
+		try {
+			Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 
-		List<Employee> employees = page.getContent();
+			Page<Employee> page = employeeRepository.findAll(pageable);
 
-		List<EmployeeDto> employeesList = employees.stream()
-				.map(employee -> modelMapper.map(employee, EmployeeDto.class)).collect(Collectors.toList());
+			List<Employee> employees = page.getContent();
 
-		return EmployeeResponse.builder().employees(employeesList).pageNo(pageNo).pageSize(pageSize).sortBy(sortBy)
-				.totalElements(page.getTotalElements()).totalPages(page.getTotalPages()).isFirst(page.isFirst())
-				.isLast(page.isLast()).build();
+			List<EmployeeDto> employeesList = employees.stream()
+					.map(employee -> modelMapper.map(employee, EmployeeDto.class)).collect(Collectors.toList());
+
+			employeeResponse = EmployeeResponse.builder().employees(employeesList).pageNo(pageNo).pageSize(pageSize)
+					.sortBy(sortBy).totalElements(page.getTotalElements()).totalPages(page.getTotalPages())
+					.isFirst(page.isFirst()).isLast(page.isLast()).build();
+
+		} catch (Exception e) {
+			throw new EmployeeServiceBusinessException(
+					appProperties.getMessages().get(EMPLOYEE_SERVICE_FETCH_ALL_PAGINATION_BUSINESS_EXCEPTION));
+
+		}
+
+		return employeeResponse;
+
 	}
 
 }

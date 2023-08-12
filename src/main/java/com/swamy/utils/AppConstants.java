@@ -33,4 +33,17 @@ public class AppConstants {
 	public static final String USER_LOGGED_IN_SUCCESS = "user-loggedIn-success";
 
 	public static final String WELCOME_MSG = "welcome-msg";
+
+	public static final String EMPLOYEE_SERVICE_SAVE_BUSINESS_EXCEPTION = "employee-service-business-exception";
+
+	public static final String EMPLOYEE_SERVICE_FETCHALL_BUSINESS_EXCEPTION = "employee-service-fetchAll-business-exception";
+
+	public static final String EMPLOYEE_SERVICE_GET_BY_ID_BUSINESS_EXCEPTION = "employee-service-getById-business-exception";
+
+	public static final String EMPLOYEE_SERVICE_UPDATE_BUSINESS_EXCEPTION = "employee-service-update-business-exception";
+
+	public static final String EMPLOYEE_SERVICE_DELETE_BUSINESS_EXCEPTION = "employee-service-delete-business-exception";
+
+	public static final String EMPLOYEE_SERVICE_FETCH_ALL_PAGINATION_BUSINESS_EXCEPTION = "employee-service-fetch-all-pagination-business-exception";
+
 }

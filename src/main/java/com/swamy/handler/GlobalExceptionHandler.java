@@ -14,6 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.swamy.dto.ErrorDetails;
 import com.swamy.exception.ApiException;
+import com.swamy.exception.EmployeeServiceBusinessException;
 import com.swamy.exception.ResourceNotFoundException;
 
 @RestControllerAdvice
@@ -57,6 +58,16 @@ public class GlobalExceptionHandler {
 
 	}
 
+	@ExceptionHandler(value = EmployeeServiceBusinessException.class)
+	public ResponseEntity<ErrorDetails> handleEmployeeServiceBusinessException(EmployeeServiceBusinessException exception, WebRequest webRequest) {
+		
+		ErrorDetails errorDetails = ErrorDetails.builder().message(exception.getMessage())
+				.status(HttpStatus.BAD_REQUEST).statusCode(HttpStatus.BAD_REQUEST.value())
+				.timeStamp(LocalDateTime.now()).path(webRequest.getDescription(false)).build();
+		
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+	
 	@ExceptionHandler(value = Exception.class)
 	public ResponseEntity<ErrorDetails> handleException(Exception exception, WebRequest webRequest) {
 

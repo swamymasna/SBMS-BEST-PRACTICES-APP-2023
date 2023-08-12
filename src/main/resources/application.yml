@@ -29,6 +29,12 @@ sbms-app:
     #employee-details
     employee-not-found: "Employee Not Found With Id : "
     employee-deletion-succeeded: "Employee Deleted Successfully With Id : "
+    employee-service-save-business-exception: "Exception Occurred While Creating New Employee"
+    employee-service-fetchAll-business-exception: "Exception Occurred While Fetching Employees From Database"
+    employee-service-getById-business-exception: "Exception Occurred While Fetching Employee By Id From Database "
+    employee-service-update-business-exception: "Exception Occurred While Updating Employee from Database"
+    employee-service-delete-business-exception: "Exception Occurred While Delete Employee from Database"
+    employee-service-fetch-all-pagination-business-exception: "Exception Occurred While Fetching Employees From Database"
     
     #user-details
     user-exists-by-username: User Already Available with Username..!
