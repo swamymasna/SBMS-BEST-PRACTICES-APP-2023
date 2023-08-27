@@ -15,8 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swamy.dto.EmployeeDto;
 import com.swamy.dto.EmployeeResponse;
+import com.swamy.dto.EmployeeApiResponse;
+import com.swamy.dto.EmployeeRequest;
 import com.swamy.service.EmployeeService;
 import static com.swamy.utils.AppConstants.*;
 
@@ -32,27 +33,27 @@ public class EmployeeRestController {
 
 	@PreAuthorize(ADMIN_ROLE)
 	@PostMapping
-	public ResponseEntity<EmployeeDto> addEmployee(@RequestBody @Valid EmployeeDto employeeDto) {
-		return new ResponseEntity<>(employeeService.saveEmployee(employeeDto), HttpStatus.CREATED);
+	public ResponseEntity<EmployeeResponse> addEmployee(@RequestBody @Valid EmployeeRequest employeeRequest) {
+		return new ResponseEntity<>(employeeService.saveEmployee(employeeRequest), HttpStatus.CREATED);
 	}
 
 	@PreAuthorize(ADMIN_AND_USER_ROLES)
 	@GetMapping
-	public ResponseEntity<List<EmployeeDto>> findAllEmployees() {
+	public ResponseEntity<List<EmployeeResponse>> findAllEmployees() {
 		return ResponseEntity.ok(employeeService.getAllEmployees());
 	}
 
 	@PreAuthorize(ADMIN_AND_USER_ROLES)
 	@GetMapping("/{id}")
-	public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable("id") Integer employeeId) {
+	public ResponseEntity<EmployeeResponse> getEmployeeById(@PathVariable("id") Integer employeeId) {
 		return new ResponseEntity<>(employeeService.getEmployeeById(employeeId), HttpStatus.OK);
 	}
 
 	@PreAuthorize(ADMIN_ROLE)
 	@PutMapping("/{id}")
-	public ResponseEntity<EmployeeDto> updateEmployee(@PathVariable("id") Integer employeeId,
-			@RequestBody @Valid EmployeeDto employeeDto) {
-		return new ResponseEntity<>(employeeService.updateEmployee(employeeId, employeeDto), HttpStatus.OK);
+	public ResponseEntity<EmployeeResponse> updateEmployee(@PathVariable("id") Integer employeeId,
+			@RequestBody @Valid EmployeeRequest employeeRequest) {
+		return new ResponseEntity<>(employeeService.updateEmployee(employeeId, employeeRequest), HttpStatus.OK);
 	}
 
 	@PreAuthorize(ADMIN_ROLE)
@@ -63,7 +64,7 @@ public class EmployeeRestController {
 
 	@PreAuthorize(ADMIN_AND_USER_ROLES)
 	@GetMapping("/all")
-	public ResponseEntity<EmployeeResponse> findAllEmployees(
+	public ResponseEntity<EmployeeApiResponse> findAllEmployees(
 
 			@RequestParam(name = "pageNo", defaultValue = DEFAULT_PAGE_NO, required = false) Integer pageNo,
 			@RequestParam(name = "pageSize", defaultValue = DEFAULT_PAGE_SIZE, required = false) Integer pageSize,

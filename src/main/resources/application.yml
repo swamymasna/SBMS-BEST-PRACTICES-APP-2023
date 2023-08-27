@@ -1,5 +1,10 @@
 server:
   port: 8081
+  
+springdoc:
+  api-docs:
+    path: /api-doc  
+
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver  

@@ -2,20 +2,21 @@ package com.swamy.service;
 
 import java.util.List;
 
-import com.swamy.dto.EmployeeDto;
 import com.swamy.dto.EmployeeResponse;
+import com.swamy.dto.EmployeeApiResponse;
+import com.swamy.dto.EmployeeRequest;
 
 public interface EmployeeService {
 
-	EmployeeDto saveEmployee(EmployeeDto employeeDto);
+	EmployeeResponse saveEmployee(EmployeeRequest employeeRequest);
 
-	List<EmployeeDto> getAllEmployees();
+	List<EmployeeResponse> getAllEmployees();
 
-	EmployeeDto getEmployeeById(Integer employeeId);
+	EmployeeResponse getEmployeeById(Integer employeeId);
 
-	EmployeeDto updateEmployee(Integer employeeId, EmployeeDto employeeDto);
+	EmployeeResponse updateEmployee(Integer employeeId, EmployeeRequest employeeRequest);
 
 	String deleteEmployee(Integer employeeId);
 	
-	EmployeeResponse getAllEmployees(Integer pageNo, Integer pageSize, String sortBy);
+	EmployeeApiResponse getAllEmployees(Integer pageNo, Integer pageSize, String sortBy);
 }

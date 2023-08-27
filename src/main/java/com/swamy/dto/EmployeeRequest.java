@@ -7,9 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class EmployeeDto {
-
-	private Integer employeeId;
+public class EmployeeRequest {
 
 	@NotEmpty(message = "Employee Name Must Not Be Null Or Empty")
 	@Size(min = 2, message = "Employee Name should have Atleast 2 charecters")

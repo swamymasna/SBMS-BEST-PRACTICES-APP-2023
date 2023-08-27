@@ -2,11 +2,9 @@ package com.swamy.service.impl;
 
 import static com.swamy.utils.AppConstants.EMPLOYEE_DELETION_SUCCEEDED;
 import static com.swamy.utils.AppConstants.EMPLOYEE_NOT_FOUND;
-import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_DELETE_BUSINESS_EXCEPTION;
 import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_FETCHALL_BUSINESS_EXCEPTION;
 import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_FETCH_ALL_PAGINATION_BUSINESS_EXCEPTION;
 import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_SAVE_BUSINESS_EXCEPTION;
-import static com.swamy.utils.AppConstants.EMPLOYEE_SERVICE_UPDATE_BUSINESS_EXCEPTION;
 import static com.swamy.utils.AppConstants.KEY;
 import static com.swamy.utils.AppConstants.VALUE;
 
@@ -24,7 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.swamy.dto.EmployeeDto;
+import com.swamy.dto.EmployeeApiResponse;
+import com.swamy.dto.EmployeeRequest;
 import com.swamy.dto.EmployeeResponse;
 import com.swamy.entity.Employee;
 import com.swamy.exception.EmployeeServiceBusinessException;
@@ -46,16 +45,16 @@ public class EmployeeServiceImpl implements EmployeeService {
 	private AppProperties appProperties;
 
 	@Override
-	public EmployeeDto saveEmployee(EmployeeDto employeeDto) {
+	public EmployeeResponse saveEmployee(EmployeeRequest employeeRequest) {
 
-		EmployeeDto employeeResponse = null;
+		EmployeeResponse employeeResponse = null;
 
 		try {
-			Employee employee = modelMapper.map(employeeDto, Employee.class);
+			Employee employee = modelMapper.map(employeeRequest, Employee.class);
 
 			Employee savedEmployee = employeeRepository.save(employee);
 
-			employeeResponse = modelMapper.map(savedEmployee, EmployeeDto.class);
+			employeeResponse = modelMapper.map(savedEmployee, EmployeeResponse.class);
 
 		} catch (Exception e) {
 			throw new EmployeeServiceBusinessException(
@@ -66,14 +65,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public List<EmployeeDto> getAllEmployees() {
+	public List<EmployeeResponse> getAllEmployees() {
 
-		List<EmployeeDto> employeesList = null;
+		List<EmployeeResponse> employeesList = null;
 		try {
 			List<Employee> employees = employeeRepository.findAll();
 
 			if (!employees.isEmpty()) {
-				employeesList = employees.stream().map(employee -> modelMapper.map(employee, EmployeeDto.class))
+				employeesList = employees.stream().map(employee -> modelMapper.map(employee, EmployeeResponse.class))
 						.collect(Collectors.toList());
 			} else {
 				employeesList = Collections.emptyList();
@@ -91,33 +90,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 	@Cacheable(key = KEY, value = VALUE)
 	@Override
-	public EmployeeDto getEmployeeById(Integer employeeId) {
+	public EmployeeResponse getEmployeeById(Integer employeeId) {
 
 		Employee employee = employeeRepository.findById(employeeId).orElseThrow(
 				() -> new ResourceNotFoundException(appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId));
-		return modelMapper.map(employee, EmployeeDto.class);
+		return modelMapper.map(employee, EmployeeResponse.class);
 
 	}
 
 	@CachePut(key = KEY, value = VALUE)
 	@Override
-	public EmployeeDto updateEmployee(Integer employeeId, EmployeeDto employeeDto) {
+	public EmployeeResponse updateEmployee(Integer employeeId, EmployeeRequest employeeRequest) {
 
-		EmployeeDto updateEmployeeResponse = null;
+		EmployeeResponse updateEmployeeResponse = null;
 
 		try {
 			Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new ResourceNotFoundException(
 					appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId));
 
-			employee.setEmployeeName(employeeDto.getEmployeeName());
-			employee.setEmployeeSalary(employeeDto.getEmployeeSalary());
-			employee.setEmployeeAddress(employeeDto.getEmployeeAddress());
+			employee.setEmployeeName(employeeRequest.getEmployeeName());
+			employee.setEmployeeSalary(employeeRequest.getEmployeeSalary());
+			employee.setEmployeeAddress(employeeRequest.getEmployeeAddress());
 
 			Employee updatedEmployee = employeeRepository.save(employee);
-			updateEmployeeResponse = modelMapper.map(updatedEmployee, EmployeeDto.class);
+			updateEmployeeResponse = modelMapper.map(updatedEmployee, EmployeeResponse.class);
 		} catch (Exception e) {
 			throw new EmployeeServiceBusinessException(
-					appProperties.getMessages().get(EMPLOYEE_SERVICE_UPDATE_BUSINESS_EXCEPTION));
+					appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId);
 
 		}
 
@@ -139,7 +138,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 			deletedEmployee = appProperties.getMessages().get(EMPLOYEE_DELETION_SUCCEEDED) + employeeId;
 		} catch (Exception e) {
 			throw new EmployeeServiceBusinessException(
-					appProperties.getMessages().get(EMPLOYEE_SERVICE_DELETE_BUSINESS_EXCEPTION));
+					appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId);
 
 		}
 
@@ -147,9 +146,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
-	public EmployeeResponse getAllEmployees(Integer pageNo, Integer pageSize, String sortBy) {
+	public EmployeeApiResponse getAllEmployees(Integer pageNo, Integer pageSize, String sortBy) {
 
-		EmployeeResponse employeeResponse = null;
+		EmployeeApiResponse employeeResponse = null;
 
 		try {
 			Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
@@ -158,10 +157,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 			List<Employee> employees = page.getContent();
 
-			List<EmployeeDto> employeesList = employees.stream()
-					.map(employee -> modelMapper.map(employee, EmployeeDto.class)).collect(Collectors.toList());
+			List<EmployeeResponse> employeesList = employees.stream()
+					.map(employee -> modelMapper.map(employee, EmployeeResponse.class)).collect(Collectors.toList());
 
-			employeeResponse = EmployeeResponse.builder().employees(employeesList).pageNo(pageNo).pageSize(pageSize)
+			employeeResponse = EmployeeApiResponse.builder().employees(employeesList).pageNo(pageNo).pageSize(pageSize)
 					.sortBy(sortBy).totalElements(page.getTotalElements()).totalPages(page.getTotalPages())
 					.isFirst(page.isFirst()).isLast(page.isLast()).build();
 
