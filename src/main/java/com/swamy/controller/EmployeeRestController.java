@@ -1,5 +1,11 @@
 package com.swamy.controller;
 
+import static com.swamy.utils.AppConstants.ADMIN_AND_USER_ROLES;
+import static com.swamy.utils.AppConstants.ADMIN_ROLE;
+import static com.swamy.utils.AppConstants.DEFAULT_PAGE_NO;
+import static com.swamy.utils.AppConstants.DEFAULT_PAGE_SIZE;
+import static com.swamy.utils.AppConstants.DEFAULT_SORT_BY;
+
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -15,11 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swamy.dto.EmployeeResponse;
 import com.swamy.dto.EmployeeApiResponse;
 import com.swamy.dto.EmployeeRequest;
+import com.swamy.dto.EmployeeResponse;
 import com.swamy.service.EmployeeService;
-import static com.swamy.utils.AppConstants.*;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
