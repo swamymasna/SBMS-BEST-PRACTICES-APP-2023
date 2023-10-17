@@ -56,9 +56,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 			employeeResponse = modelMapper.map(savedEmployee, EmployeeResponse.class);
 
-		} catch (Exception e) {
+		} catch (EmployeeServiceBusinessException e) {
 			throw new EmployeeServiceBusinessException(
 					appProperties.getMessages().get(EMPLOYEE_SERVICE_SAVE_BUSINESS_EXCEPTION));
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return employeeResponse;
@@ -78,10 +80,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 				employeesList = Collections.emptyList();
 			}
 
-		} catch (Exception e) {
+		} catch (EmployeeServiceBusinessException e) {
 			throw new EmployeeServiceBusinessException(
 					appProperties.getMessages().get(EMPLOYEE_SERVICE_FETCHALL_BUSINESS_EXCEPTION));
 
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return employeesList;
@@ -114,10 +118,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 
 			Employee updatedEmployee = employeeRepository.save(employee);
 			updateEmployeeResponse = modelMapper.map(updatedEmployee, EmployeeResponse.class);
-		} catch (Exception e) {
+		} catch (EmployeeServiceBusinessException e) {
 			throw new EmployeeServiceBusinessException(
 					appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId);
 
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return updateEmployeeResponse;
@@ -136,10 +142,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 			employeeRepository.delete(employee);
 
 			deletedEmployee = appProperties.getMessages().get(EMPLOYEE_DELETION_SUCCEEDED) + employeeId;
-		} catch (Exception e) {
+		} catch (EmployeeServiceBusinessException e) {
 			throw new EmployeeServiceBusinessException(
 					appProperties.getMessages().get(EMPLOYEE_NOT_FOUND) + employeeId);
 
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return deletedEmployee;
@@ -164,10 +172,12 @@ public class EmployeeServiceImpl implements EmployeeService {
 					.sortBy(sortBy).totalElements(page.getTotalElements()).totalPages(page.getTotalPages())
 					.isFirst(page.isFirst()).isLast(page.isLast()).build();
 
-		} catch (Exception e) {
+		} catch (EmployeeServiceBusinessException e) {
 			throw new EmployeeServiceBusinessException(
 					appProperties.getMessages().get(EMPLOYEE_SERVICE_FETCH_ALL_PAGINATION_BUSINESS_EXCEPTION));
 
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 		return employeeResponse;
